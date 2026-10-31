@@ -29,8 +29,12 @@ public final class ServiceBehindUnstableNetwork implements NetworkComponent {
         /*
          * The probability should be in [0, 1[!
          */
-        this.failProbability = failProbability;
-        randomGenerator = new Random(randomSeed);
+        if (failProbability<0 || failProbability>=1) {
+            throw new IllegalArgumentException("The probability is out of range");
+        } else {
+            this.failProbability = failProbability;
+            randomGenerator = new Random(randomSeed);
+        }
     }
 
     /**
@@ -64,6 +68,7 @@ public final class ServiceBehindUnstableNetwork implements NetworkComponent {
              *
              * The previous exceptions must be set as the cause of the new exception
              */
+        throw new IllegalArgumentException(message);
         }
     }
 
@@ -79,7 +84,7 @@ public final class ServiceBehindUnstableNetwork implements NetworkComponent {
 
     private void accessTheNetwork(final String message) throws IOException {
         if (randomGenerator.nextDouble() < failProbability) {
-            throw new IOException("Generic I/O error");
+            throw new NetworkException("Generic I/O error");
         }
     }
 
