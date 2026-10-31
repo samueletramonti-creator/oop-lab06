@@ -38,7 +38,7 @@ public final class SocialNetworkUserImpl<U extends User> extends UserImpl implem
      *
      * think of what type of keys and values would best suit the requirements
      */
-
+    private HashMap<String,Set<U>> followedUsers;
     /*
      * [CONSTRUCTORS]
      *
@@ -50,6 +50,10 @@ public final class SocialNetworkUserImpl<U extends User> extends UserImpl implem
      * - username
      * - age and every other necessary field
      */
+    public SocialNetworkUserImpl (String firstName,String lastName,String username,int age) {
+        super(firstName,lastName,username,age);
+        this.followedUsers=new HashMap<>();
+    }
     /**
      * Builds a user participating in a social network.
      *
@@ -63,14 +67,13 @@ public final class SocialNetworkUserImpl<U extends User> extends UserImpl implem
      *            alias of the user, i.e. the way a user is identified on an
      *            application
      */
-    public SocialNetworkUserImpl(final String name, final String surname, final String user, final int userAge) {
-        super(null, null, null, 0);
-    }
 
     /*
      * 2) Define a further constructor where the age defaults to -1
      */
-
+    public SocialNetworkUserImpl(final String firstname, final String lastname, final String username) {
+        this(firstname, lastname, username, -1);
+}
     /*
      * [METHODS]
      *
@@ -78,7 +81,7 @@ public final class SocialNetworkUserImpl<U extends User> extends UserImpl implem
      */
     @Override
     public boolean addFollowedUser(final String circle, final U user) {
-        return false;
+        return this.followedUsers.computeIfAbsent(circle, k -> new HashSet<>()).add(user);
     }
 
     /**
@@ -88,11 +91,15 @@ public final class SocialNetworkUserImpl<U extends User> extends UserImpl implem
      */
     @Override
     public Collection<U> getFollowedUsersInGroup(final String groupName) {
-        return null;
+        return this.followedUsers.get(groupName);
     }
 
     @Override
     public List<U> getFollowedUsers() {
-        return null;
+        Set<U> uniqueUsers = new HashSet<>();
+        for (Set<U> group : this.followedUsers.values()) {
+            uniqueUsers.addAll(group);
+        }
+        return new ArrayList<>(uniqueUsers);
     }
 }
